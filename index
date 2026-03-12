@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lateral Triggers</title>
+<meta name="description" content="Deck de provocación para equipos de producto digital">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:#FAFAF8;color:#1A1A1A;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script>
+const e=React.createElement,{useState,useCallback,useRef,useEffect}=React;
+
+const CATEGORIES={
+standard:{label:"Sube el estándar",color:"#C44D38"},
+context:{label:"Cambia el contexto",color:"#2B6CB0"},
+flip:{label:"Voltéalo",color:"#6B3FA0"},
+system:{label:"Piensa en sistema",color:"#1A8A6A"},
+honesty:{label:"Sé brutalmente honesto",color:"#B03A5C"},
+edge:{label:"Llévalo al extremo",color:"#C47A2B"}
+};
+
+const cards=[
+{q:"¿Qué pasa si tienes que pitchear esto a Steve Jobs?",t:"¿Podrías justificar cada decisión con una razón clara y contundente? ¿O hay cosas que están ahí por inercia?",cat:"standard"},
+{q:"¿Qué pasa si este diseño va a ser caso de estudio en una conferencia?",t:"¿Qué le falta para que alguien quiera analizar las decisiones que tomaste?",cat:"standard"},
+{q:"¿Qué pasa si tu mayor referente en diseño revisa tu archivo mañana?",t:"No pienses en impresionar. Piensa en si podrías defender cada decisión frente a alguien que respetas profundamente.",cat:"standard"},
+{q:"¿Qué pasa si la tasa de retención de tu feature depende exclusivamente de tu diseño?",t:"Si los usuarios no regresan, ¿qué parte de la experiencia no está generando el hábito o el valor suficiente?",cat:"standard"},
+{q:"¿Qué pasa si tienes que demostrar con datos que tu diseño es mejor que la versión anterior?",t:"¿Qué métricas definirías como éxito? Si no puedes nombrarlas, probablemente no sabes qué estás resolviendo.",cat:"standard"},
+{q:"¿Qué pasa si el NPS del producto depende de este flujo?",t:"¿Tu diseño genera la emoción suficiente para que alguien recomiende el producto a otra persona?",cat:"standard"},
+{q:"¿Qué pasa si este es el último proyecto que diseñas en tu carrera?",t:"¿Estás dejando lo mejor que tienes o estás entregando lo mínimo viable?",cat:"standard"},
+{q:"¿Qué pasa si el usuario compara tu producto con el mejor que ha usado en su vida?",t:"No compites solo contra tu competencia directa. Compites contra la mejor experiencia que tu usuario recuerda.",cat:"standard"},
+{q:"¿Qué pasa si tu diseño tiene que reducir los tickets de soporte a la mitad?",t:"Cada ticket es un momento donde tu diseño falló en comunicar. ¿Dónde está la fricción que podrías eliminar?",cat:"standard"},
+{q:"¿Qué pasa si el conversion rate de este flujo baja 20% después de tu rediseño?",t:"Bonito no es suficiente. ¿Cada cambio estético que hiciste mejora o empeora la claridad funcional?",cat:"standard"},
+{q:"¿Qué pasa si tuvieras que diseñar esto para la pantalla de un automóvil?",t:"Distracción, velocidad, seguridad. ¿Qué sobrevive de tu diseño cuando el contexto castiga la complejidad?",cat:"context"},
+{q:"¿Qué pasa si esto fuera un producto físico en un estante, no una pantalla?",t:"En un estante compites por atención con presencia. ¿Tu diseño tiene esa presencia aunque sea digital?",cat:"context"},
+{q:"¿Qué pasa si tu usuario está en el transporte público, con una mano, con prisa?",t:"¿Tu diseño funciona en el peor contexto real de uso, no solo en el mockup perfecto?",cat:"context"},
+{q:"¿Qué pasa si esto lo diseñaras para un smartwatch?",t:"¿Cuál es la única cosa que importa cuando solo tienes 38mm para comunicar?",cat:"context"},
+{q:"¿Qué pasa si tu producto se usa en un país donde nunca has vivido?",t:"¿Hay supuestos culturales en tu diseño que ni siquiera estás viendo?",cat:"context"},
+{q:"¿Qué pasa si el primer contacto del usuario con tu producto es una notificación, no la pantalla principal?",t:"¿Dónde empieza realmente la experiencia? Probablemente no donde crees.",cat:"context"},
+{q:"¿Qué pasa si tu usuario está frustrado con el problema que intentas resolver?",t:"No llegan en neutro. Llegan hartos. ¿Tu diseño reconoce esa emoción o la ignora?",cat:"context"},
+{q:"¿Qué pasa si tu diseño tiene que funcionar para alguien con baja alfabetización digital?",t:"¿Cuánto de tu solución depende de convenciones que solo los power users conocen?",cat:"context"},
+{q:"¿Qué pasa si tu usuario usa tu producto una vez al mes, no todos los días?",t:"¿Tu diseño es memorable y re-aprendible o requiere uso frecuente para tener sentido?",cat:"context"},
+{q:"¿Qué pasa si tu usuario tiene 14 años? ¿Y si tiene 65?",t:"No como ejercicio de accesibilidad. Como ejercicio de empatía. ¿Qué expectativas diferentes traen a tu producto?",cat:"context"},
+{q:"¿Qué pasa si priorizas 80% función y 20% forma?",t:"¿Qué decisiones estéticas estás tomando que en realidad le restan a la experiencia funcional?",cat:"flip"},
+{q:"¿Y si al revés? 80% forma y 20% función.",t:"¿Qué pasa si la belleza y la emoción son la función? ¿Cuándo la estética es el diferenciador real?",cat:"flip"},
+{q:"¿Qué pasa si haces exactamente lo opuesto a tu primera intuición?",t:"Tu primer instinto está entrenado por tus hábitos. El opuesto puede revelar un camino que tu comodidad te ocultaba.",cat:"flip"},
+{q:"¿Qué pasa si eliminas la feature que consideras central?",t:"Si quitas lo que crees imprescindible, ¿el producto sigue teniendo sentido? ¿Quizás más?",cat:"flip"},
+{q:"¿Qué pasa si en vez de simplificar, haces todo más denso a propósito?",t:"A veces la complejidad bien manejada crea profundidad y sensación de poder. No todo tiene que ser minimal.",cat:"flip"},
+{q:"¿Qué pasa si el usuario tiene el control total en vez de que tú lo guíes?",t:"¿Estás diseñando un camino forzado o un espacio de posibilidades?",cat:"flip"},
+{q:"¿Qué pasa si diseñas primero para el caso extremo y después adaptas al caso común?",t:"Diseñar para el edge case primero suele crear soluciones más robustas para todos.",cat:"flip"},
+{q:"¿Qué pasa si el onboarding no existe y el producto tiene que explicarse solo?",t:"¿Tu diseño necesita instrucciones o es intuitivo por sí mismo?",cat:"flip"},
+{q:"¿Qué pasa si en vez de agregar una pantalla nueva, resuelves el problema dentro de una existente?",t:"Más pantallas no siempre es más claridad. A veces es más fragmentación.",cat:"flip"},
+{q:"¿Qué pasa si la solución no es una interfaz?",t:"¿Realmente se necesita una pantalla para esto o estás diseñando UI por reflejo?",cat:"flip"},
+{q:"¿Qué pasa si el usuario llega a tu producto desde un anuncio que prometió algo diferente?",t:"Marketing y producto son la misma experiencia. ¿Tu diseño cumple lo que la marca promete?",cat:"system"},
+{q:"¿Qué pasa si el email de confirmación es tan bueno como la mejor pantalla de tu app?",t:"Los transaccionales son touchpoints. ¿Los estás diseñando o los está generando un template?",cat:"system"},
+{q:"¿Qué pasa si soporte al cliente no existiera y tu diseño tuviera que resolver todas las dudas?",t:"Cada pregunta frecuente en soporte es una falla de diseño. ¿Las conoces?",cat:"system"},
+{q:"¿Qué pasa si la experiencia del usuario incluye también la factura que recibe?",t:"La experiencia no termina en el UI. Documentos, emails, notificaciones, facturas. ¿Todo habla el mismo idioma?",cat:"system"},
+{q:"¿Qué pasa si el vendedor tiene que explicar tu producto sin mostrar la pantalla?",t:"Si ventas no puede articular el valor sin un demo, ¿tu producto comunica su propuesta o depende de un guía?",cat:"system"},
+{q:"¿Qué pasa si tu diseño tiene que funcionar coordinado con 3 equipos que no hablan entre sí?",t:"Diseñar en silos crea experiencias en silos. ¿Quién es dueño de la experiencia completa?",cat:"system"},
+{q:"¿Qué pasa si la notificación push, el email y la pantalla del producto cuentan historias diferentes?",t:"El usuario no piensa en canales. Piensa en su experiencia con tu marca. ¿Es coherente?",cat:"system"},
+{q:"¿Qué pasa si mapeas todos los momentos donde el usuario interactúa con tu marca fuera de tu app?",t:"Redes sociales, correos, llamadas de soporte, reviews, boca a boca. ¿Tu diseño considera ese ecosistema?",cat:"system"},
+{q:"¿Qué pasa si el journey del usuario empieza 2 semanas antes de abrir tu app por primera vez?",t:"¿Qué vio, leyó, escuchó antes de llegar? ¿Tu diseño continúa esa narrativa o la rompe?",cat:"system"},
+{q:"¿Qué pasa si la experiencia post-compra es más importante que la experiencia pre-compra?",t:"Muchos productos invierten todo en la conversión y nada en la retención. ¿Dónde está tu atención?",cat:"system"},
+{q:"¿Esto es lo mejor que puedo hacer, o es lo más rápido?",t:"No hay juicio. Solo la pregunta. Y la respuesta honesta.",cat:"honesty"},
+{q:"¿Qué parte de tu diseño existe porque siempre lo has hecho así?",t:"Identifica el patrón que repites por comodidad. Ahí está tu punto ciego.",cat:"honesty"},
+{q:"¿Qué pasa si admites que no entiendes del todo el problema que estás resolviendo?",t:"Volver a investigar no es retroceder. Es lo más valiente que puedes hacer a mitad de proyecto.",cat:"honesty"},
+{q:"¿Si cubrieras el nombre de tu producto, podrías distinguirlo de la competencia?",t:"Si se ve como todas las demás apps del mercado, ¿cuál es la razón real para que exista?",cat:"honesty"},
+{q:"¿En qué momento dejaste de explorar y empezaste a ejecutar?",t:"A veces cerramos demasiado rápido porque la ambigüedad incomoda. ¿Cerraste por convicción o por ansiedad?",cat:"honesty"},
+{q:"¿Qué decisión tomaste por miedo a que la rechazaran?",t:"Esa versión que descartaste antes de mostrarla, ¿la descartaste tú o el miedo?",cat:"honesty"},
+{q:"¿Estás diseñando para el usuario o para que se apruebe en la review?",t:"Son dos cosas distintas. Y a veces lo que el usuario necesita es lo que la review más cuestiona.",cat:"honesty"},
+{q:"¿Tu diseño resuelve un problema real o decora una solución mediocre?",t:"Visual polish no es diseño. Si la base es débil, la superficie no lo salva.",cat:"honesty"},
+{q:"¿Cuándo fue la última vez que descartaste una idea tuya porque encontraste una mejor?",t:"Si no estás matando ideas propias constantemente, puede que te estés enamorando de la primera que funciona.",cat:"honesty"},
+{q:"¿Estás resolviendo el problema del usuario o el problema que el brief describió?",t:"No siempre son lo mismo. ¿Cuándo fue la última vez que cuestionaste el brief?",cat:"honesty"},
+{q:"¿Qué pasa si la transición entre pantallas es lo más memorable de todo el producto?",t:"La micro-interacción es donde vive el deleite. ¿Le estás dedicando la atención que merece?",cat:"edge"},
+{q:"¿Qué pasa si el estado vacío es la pantalla más diseñada de todo el producto?",t:"Es lo primero que ve un usuario nuevo. Tu primera impresión. ¿Y le pusiste un ícono gris con texto genérico?",cat:"edge"},
+{q:"¿Qué pasa si el loading state es tan bueno que nadie quiere que termine?",t:"Los momentos de espera son oportunidades desperdiciadas. ¿Qué podrías hacer con ellos?",cat:"edge"},
+{q:"¿Qué pasa si tu diseño provoca que el usuario quiera enseñárselo a alguien?",t:"El producto más viral es el que la gente muestra porque quiere, no porque se lo piden.",cat:"edge"},
+{q:"¿Qué pasa si cada error del usuario se convierte en un momento de confianza?",t:"Los error states son donde se construye o se destruye la relación con el producto. ¿Los estás diseñando con cariño?",cat:"edge"},
+{q:"¿Qué pasa si la animación cuenta la historia de lo que está pasando con los datos?",t:"El movimiento no es decoración. Es información. ¿Tus animaciones comunican o solo adornan?",cat:"edge"},
+{q:"¿Qué pasa si el momento de éxito del usuario se siente como una celebración?",t:"Completó la tarea. ¿Y luego qué? ¿Un check verde? ¿O algo que lo haga sonreír?",cat:"edge"},
+{q:"¿Qué pasa si diseñas la versión que te daría miedo presentar porque es demasiado ambiciosa?",t:"Diseña esa versión. Aunque no se implemente completa, va a empujar la conversación hacia un lugar más interesante.",cat:"edge"},
+{q:"¿Qué pasa si el sonido del producto es tan distintivo como su visual?",t:"Piensa en el sonido de enviar un mensaje en Slack o el pull-to-refresh. ¿Tu producto tiene identidad sonora?",cat:"edge"},
+{q:"¿Qué pasa si diseñas un easter egg que solo descubren los usuarios más comprometidos?",t:"Los detalles ocultos crean comunidad y sensación de descubrimiento. ¿Tu producto tiene capas?",cat:"edge"}
+];
+
+const T={bg:"#FAFAF8",fg:"#1A1A1A",mid:"#636360",light:"#DDDDD8",subtle:"#8A8A86",card:"#FFFFFF"};
+const FA="all";
+
+function App(){
+const[cur,setCur]=useState(null);
+const[flipped,setFlipped]=useState(false);
+const[hist,setHist]=useState([]);
+const[filter,setFilter]=useState(FA);
+const[anim,setAnim]=useState(false);
+const[intro,setIntro]=useState(true);
+const poolRef=useRef([...Array(cards.length).keys()]);
+
+const getIdx=useCallback(()=>{
+if(filter===FA)return[...Array(cards.length).keys()];
+return cards.reduce((a,c,i)=>(c.cat===filter?[...a,i]:a),[]);
+},[filter]);
+
+useEffect(()=>{
+poolRef.current=getIdx().filter(i=>!hist.includes(i));
+},[filter,hist,getIdx]);
+
+const draw=useCallback(()=>{
+if(anim)return;
+let p=poolRef.current;
+if(p.length===0){
+poolRef.current=getIdx().filter(i=>!hist.slice(-5).includes(i));
+p=poolRef.current;
+if(p.length===0){poolRef.current=getIdx();p=poolRef.current;}
+}
+const idx=p[Math.floor(Math.random()*p.length)];
+setAnim(true);setFlipped(false);
+setTimeout(()=>{
+setCur(idx);setHist(h=>[...h,idx]);
+poolRef.current=poolRef.current.filter(i=>i!==idx);
+setFlipped(true);setAnim(false);
+},250);
+},[anim,hist,getIdx]);
+
+const s=(o)=>Object.assign({},o);
+const wrap={minHeight:"100vh",background:T.bg,color:T.fg,fontFamily:"'Inter',-apple-system,system-ui,sans-serif",display:"flex",alignItems:"center",justifyContent:"center",padding:24};
+const inner={maxWidth:480,width:"100%"};
+
+if(intro){
+const steps=[["Define tu reto","Escribe en una frase el problema de diseño en el que estás trabajando."],["Saca una carta","Cada carta cambia las condiciones del problema para forzarte a pensar desde otro lugar."],["Idea sin filtro","10 minutos. No juzgues. La carta es una provocación, no una instrucción literal."]];
+return e("div",{style:wrap},
+e("div",{style:inner},
+e("p",{style:{fontSize:13,fontWeight:500,color:T.mid,letterSpacing:"0.06em",textTransform:"uppercase",marginBottom:8}},"Herramienta de ideación"),
+e("h1",{style:{fontSize:32,fontWeight:700,marginBottom:32,letterSpacing:"-0.03em",lineHeight:1.1}},"Lateral Triggers"),
+e("div",{style:{marginBottom:40}},
+steps.map(([title,desc],i)=>e("div",{key:i,style:{display:"flex",gap:16,marginBottom:20,alignItems:"baseline"}},
+e("span",{style:{fontSize:13,fontWeight:600,color:T.subtle,minWidth:20}},i+1+"."),
+e("div",null,
+e("p",{style:{fontWeight:600,fontSize:15,marginBottom:2}},title),
+e("p",{style:{color:T.mid,fontSize:13,lineHeight:1.5}},desc)
+)))),
+e("div",{style:{marginBottom:40}},
+e("p",{style:{fontSize:12,fontWeight:500,color:T.subtle,letterSpacing:"0.06em",textTransform:"uppercase",marginBottom:12}},"6 categorías"),
+e("div",{style:{display:"flex",flexWrap:"wrap",gap:8}},
+Object.entries(CATEGORIES).map(([k,v])=>e("span",{key:k,style:{fontSize:12,fontWeight:500,padding:"5px 12px",borderRadius:4,background:v.color+"10",color:v.color}},v.label))
+)),
+e("p",{style:{color:T.subtle,fontSize:12,marginBottom:32}},cards.length+" cartas. Diseñadas para equipos de producto que necesitan salir de lo cómodo."),
+e("button",{onClick:()=>setIntro(false),style:{width:"100%",padding:"14px 24px",background:T.fg,color:T.bg,border:"none",borderRadius:8,fontSize:15,fontWeight:600,cursor:"pointer"},onMouseEnter:x=>x.target.style.opacity="0.8",onMouseLeave:x=>x.target.style.opacity="1"},"Comenzar")
+));
+}
+
+const c=cur!==null?cards[cur]:null;
+const cat=c?CATEGORIES[c.cat]:null;
+
+return e("div",{style:Object.assign({},wrap,{flexDirection:"column",padding:"24px 20px"})},
+e("div",{style:inner},
+e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:20}},
+e("h1",{style:{fontSize:18,fontWeight:700,letterSpacing:"-0.02em",margin:0}},"Lateral Triggers"),
+e("div",{style:{display:"flex",gap:12,alignItems:"baseline"}},
+e("span",{style:{color:T.subtle,fontSize:12}},hist.length+"/"+cards.length),
+e("button",{onClick:()=>setIntro(true),style:{background:"none",border:"none",color:T.subtle,fontSize:12,cursor:"pointer",padding:0,textDecoration:"underline",textUnderlineOffset:2}},"Info")
+)),
+e("div",{style:{display:"flex",flexWrap:"wrap",gap:4,marginBottom:24}},
+e("button",{onClick:()=>setFilter(FA),style:{padding:"5px 12px",borderRadius:4,fontSize:12,fontWeight:500,cursor:"pointer",transition:"all 0.15s",border:filter===FA?"1.5px solid "+T.fg:"1px solid "+T.light,background:filter===FA?T.fg:"transparent",color:filter===FA?T.bg:T.mid}},"Todas"),
+Object.entries(CATEGORIES).map(([k,v])=>e("button",{key:k,onClick:()=>setFilter(k),style:{padding:"5px 12px",borderRadius:4,fontSize:12,fontWeight:500,cursor:"pointer",transition:"all 0.15s",border:filter===k?"1.5px solid "+v.color:"1px solid "+T.light,background:filter===k?v.color:"transparent",color:filter===k?"#fff":T.mid}},v.label))
+),
+e("div",{style:{marginBottom:20,minHeight:340}},
+cur===null?
+e("div",{style:{border:"1px solid "+T.light,borderRadius:12,padding:48,minHeight:300,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center"}},
+e("p",{style:{color:T.subtle,fontSize:14}},"Saca tu primera carta")
+):
+e("div",{style:{opacity:flipped?1:0,transform:flipped?"translateY(0)":"translateY(8px)",transition:"all 0.25s ease"}},
+e("div",{style:{borderRadius:12,padding:"32px 28px",minHeight:300,border:"1px solid "+T.light,background:T.card,display:"flex",flexDirection:"column"}},
+e("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:28}},
+e("span",{style:{fontSize:12,fontWeight:600,color:cat.color,letterSpacing:"0.02em"}},cat.label),
+e("span",{style:{color:T.subtle,fontSize:11}},(cur+1)+"/"+cards.length)
+),
+e("p",{style:{fontSize:24,fontWeight:600,lineHeight:1.35,letterSpacing:"-0.02em",flex:1,marginBottom:24,color:T.fg}},c.q),
+e("div",{style:{borderTop:"1px solid "+T.light,paddingTop:16}},
+e("p",{style:{fontSize:13,color:T.mid,lineHeight:1.6,margin:0}},c.t)
+)))
+),
+e("button",{onClick:draw,disabled:anim,style:{width:"100%",padding:"14px 24px",background:T.fg,color:T.bg,border:"none",borderRadius:8,fontSize:15,fontWeight:600,cursor:anim?"not-allowed":"pointer",opacity:anim?0.4:1,transition:"opacity 0.15s"},onMouseEnter:x=>{if(!anim)x.target.style.opacity="0.8"},onMouseLeave:x=>{if(!anim)x.target.style.opacity="1"}},cur===null?"Sacar carta":"Siguiente carta")
+));
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(e(React.StrictMode,null,e(App)));
+</script>
+</body>
+</html>
